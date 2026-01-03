@@ -1,0 +1,164 @@
+/* Cards */
+.card {
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.card__image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.card:hover .card__image img {
+    transform: scale(1.05);
+}
+
+.card__badge {
+    position: absolute;
+    top: var(--spacing-md);
+    left: var(--spacing-md);
+    background: var(--color-red);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.card__content {
+    padding: var(--spacing-lg);
+}
+
+.card__title {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-black);
+}
+
+.card__meta {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.875rem;
+    color: var(--color-gray);
+}
+
+.card__description {
+    color: var(--color-gray);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
+}
+
+.card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--color-light-gray);
+}
+
+.performance-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-light-gray);
+    transition: all 0.3s;
+}
+
+.performance-card:hover {
+    border-color: var(--color-blue);
+    box-shadow: 0 4px 20px rgba(44, 64, 104, 0.1);
+}
+
+.performance-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+}
+
+.performance-card__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.performance-card__time {
+    background: var(--color-blue);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.performance-card__meta {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.875rem;
+    color: var(--color-gray);
+}
+
+.performance-card__age {
+    background: rgba(244, 49, 57, 0.1);
+    color: var(--color-red);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+}
+
+.performance-card__price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-red);
+}
+
+@media (max-width: 768px) {
+    .card__image {
+        height: 180px;
+    }
+    
+    .performance-card {
+        padding: var(--spacing-md);
+    }
+}
+
+
+.card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--color-light-gray);
+    gap: 20px;
+}
+
+.card__price {
+    font-weight: 700;
+    color: var(--color-red);
+    white-space: nowrap;
+    min-width: 100px;
+}
+
+.card__actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}

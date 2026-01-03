@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование билетов | Театр "Микос"</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components/header.css">
+    <link rel="stylesheet" href="css/components/footer.css">
+    <link rel="stylesheet" href="css/components/buttons.css">
+    <link rel="stylesheet" href="css/components/cards.css">
+    <style>
+        .booking-page {
+            padding: 40px 0;
+            min-height: 70vh;
+        }
+        
+        .booking-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 40px;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        
+        .step.active {
+            opacity: 1;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--color-light-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .step.active .step-number {
+            background: var(--color-blue);
+            color: white;
+        }
+        
+        .booking-section {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .booking-section.active {
+            display: block;
+        }
+        
+        .seats-layout {
+            margin: 30px 0;
+        }
+        
+        .stage {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--color-light-gray);
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .seats-grid {
+            display: grid;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .seat-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .seat {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--color-light-gray);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .seat:hover {
+            border-color: var(--color-blue);
+        }
+        
+        .seat.selected {
+            background: var(--color-blue);
+            color: white;
+            border-color: var(--color-blue);
+        }
+        
+        .seat.unavailable {
+            background: var(--color-light-gray);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .seat.legend {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+        
+        .seat-legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            font-size: 0.875rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .selected-seats {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--color-light-gray);
+            border-radius: 8px;
+        }
+        
+        .selected-seats h3 {
+            margin-bottom: 15px;
+        }
+        
+        .selected-seats-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .selected-seat {
+            background: var(--color-blue);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .booking-summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--color-light-gray);
+            border-radius: 8px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid var(--color-gray);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-red);
+        }
+        
+        @media (max-width: 768px) {
+            .booking-steps {
+                flex-direction: column;
+                gap: 20px;
+                align-items: center;
+            }
+            
+            .booking-section {
+                padding: 20px;
+            }
+            
+            .seat {
+                width: 30px;
+                height: 30px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header__container">
+            <a href="index.html" class="header__logo">
+                <div class="logo__icon">М</div>
+                <span class="logo__text">МИКОС</span>
+            </a>
+            
+            <button class="menu-toggle" id="menu-toggle" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <nav class="nav" id="main-nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link">Афиша</a></li>
+                    <li><a href="#performances" class="nav__link">Спектакли</a></li>
+                    <li><a href="booking.html" class="nav__link active">Бронирование</a></li>
+                    <li><a href="#about" class="nav__link">О театре</a></li>
+                    <li><a href="#contacts" class="nav__link">Контакты</a></li>
+                    <li class="nav__auth" id="auth-container">
+                        <!-- Авторизация -->
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="booking-page">
+            <div class="container">
+                <h1 style="text-align: center; margin-bottom: 40px;">Бронирование билетов</h1>
+                
+                <!-- Шаги бронирования -->
+                <div class="booking-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div>Выбор мест</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div>Оформление</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div>Подтверждение</div>
+                    </div>
+                </div>
+                
+                <!-- Шаг 1: Выбор мест -->
+                <div class="booking-section active" id="step-1">
+                    <h2>Выберите места</h2>
+                    <p id="performance-info">Спектакль: Загрузка...</p>
+                    
+                    <div class="seats-layout">
+                        <div class="stage">СЦЕНА</div>
+                        
+                        <div class="seats-grid" id="seats-grid">
+                            <!-- Динамически заполняется через JS -->
+                        </div>
+                        
+                        <div class="seat-legend">
+                            <div class="legend-item">
+                                <div class="seat legend available"></div>
+                                <span>Доступно</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="seat legend selected"></div>
+                                <span>Выбрано</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="seat legend unavailable"></div>
+                                <span>Занято</span>
+                            </div>
+                        </div>
+                        
+                        <div class="selected-seats" id="selected-seats">
+                            <h3>Выбранные места: <span id="selected-count">0</span></h3>
+                            <div class="selected-seats-list" id="selected-seats-list">
+                                <!-- Динамически заполняется -->
+                            </div>
+                            <div>Общая стоимость: <span id="selected-total">0</span> ₽</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                        <a href="index.html" class="btn btn--outline">Вернуться к афише</a>
+                        <button class="btn btn--primary" id="next-step-1" disabled>
+                            Продолжить
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 2: Оформление -->
+                <div class="booking-section" id="step-2">
+                    <h2>Оформление заказа</h2>
+                    
+                    <form id="booking-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label for="first-name">Имя *</label>
+                                <input type="text" id="first-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Фамилия *</label>
+                                <input type="text" id="last-name" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Телефон *</label>
+                                <input type="tel" id="phone" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label>
+                                <input type="checkbox" id="save-data" checked>
+                                <span>Сохранить данные для будущих бронирований</span>
+                            </label>
+                        </div>
+                        
+                        <div class="booking-summary">
+                            <h3>Детали заказа</h3>
+                            <div id="order-details">
+                                <!-- Динамически заполняется -->
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                            <button type="button" class="btn btn--outline" id="prev-step-2">
+                                Назад к выбору мест
+                            </button>
+                            <button type="submit" class="btn btn--primary" id="next-step-2">
+                                Перейти к оплате
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Шаг 3: Подтверждение -->
+                <div class="booking-section" id="step-3">
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="width: 80px; height: 80px; background: #4CAF50; color: white; 
+                             border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                             font-size: 2rem; margin: 0 auto 20px;">
+                            ✓
+                        </div>
+                        <h2>Бронирование успешно завершено!</h2>
+                        <p style="color: var(--color-gray); margin-bottom: 30px;">
+                            Номер вашего заказа: <strong id="order-number">#000000</strong><br>
+                            Подробности отправлены на вашу почту
+                        </p>
+                        <div style="display: flex; gap: 20px; justify-content: center;">
+                            <a href="index.html" class="btn btn--primary">Вернуться к афише</a>
+                            <a href="account.html#bookings" class="btn btn--outline">Мои билеты</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="footer">
+        <div class="footer__container">
+            <div class="footer__grid">
+                <div class="footer__section">
+                    <h3 class="footer__title">Театр "Микос"</h3>
+                    <p style="color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 20px;">
+                        Театр-феномен, соединяющий 30-летние традиции высочайшего мастерства клоунады с авангардной, эксцентричной подачей.
+                    </p>
+                </div>
+                
+                <div class="footer__section">
+                    <h3 class="footer__title">Меню</h3>
+                    <div class="footer__links">
+                        <a href="index.html">Афиша</a>
+                        <a href="#performances">Спектакли</a>
+                        <a href="booking.html">Бронирование</a>
+                        <a href="#about">О театре</a>
+                        <a href="#contacts">Контакты</a>
+                    </div>
+                </div>
+                
+                <div class="footer__section">
+                    <h3 class="footer__title">Контакты</h3>
+                    <div class="footer__contacts">
+                        <div class="contact-item">
+                            <div>📞</div>
+                            <div>+7 (495) 123-45-67</div>
+                        </div>
+                        <div class="contact-item">
+                            <div>✉️</div>
+                            <div>info@micos-theatre.ru</div>
+                        </div>
+                        <div class="contact-item">
+                            <div>📍</div>
+                            <div>Москва, ул. Театральная, 1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer__bottom">
+                <div class="footer__copyright">© 2024 Театр "Микос". Все права защищены.</div>
+                <div class="footer__legal">
+                    <a href="#" class="footer__legal-link">Политика конфиденциальности</a>
+                    <a href="#" class="footer__legal-link">Пользовательское соглашение</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/modules/booking.js"></script>
+</body>
+</html>

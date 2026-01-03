@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лишь бы не было детей | Театр "Микос"</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components/header.css">
+    <link rel="stylesheet" href="css/components/footer.css">
+    <link rel="stylesheet" href="css/components/buttons.css">
+    <link rel="stylesheet" href="css/components/cards.css">
+    <style>
+        .performance-page {
+            padding: 40px 0;
+        }
+        
+        .breadcrumbs {
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            color: var(--color-gray);
+        }
+        
+        .breadcrumbs a {
+            color: var(--color-blue);
+            text-decoration: none;
+        }
+        
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+        
+        .performance-header {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 40px;
+            align-items: flex-start;
+        }
+        
+        .performance-poster {
+            flex: 0 0 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .performance-poster img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .performance-info {
+            flex: 1;
+        }
+        
+        .performance-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--color-black);
+        }
+        
+        .performance-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            background: var(--color-white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--color-light-gray);
+            font-weight: 500;
+        }
+        
+        .meta-item.age {
+            background: var(--color-red);
+            color: white;
+            border: none;
+        }
+        
+        .performance-price {
+            font-size: 1.8rem;
+            color: var(--color-red);
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        
+        .performance-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .performance-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .performance-description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        .performance-description h3 {
+            margin: 30px 0 15px;
+            color: var(--color-blue);
+        }
+        
+        .cast-list {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .cast-item {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .cast-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--color-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .cast-info h4 {
+            margin-bottom: 4px;
+        }
+        
+        .cast-info p {
+            color: var(--color-gray);
+            font-size: 0.9rem;
+        }
+        
+        .schedule-section {
+            margin-bottom: 60px;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--color-light-gray);
+            transition: all 0.3s;
+        }
+        
+        .schedule-item:hover {
+            border-color: var(--color-blue);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .schedule-date {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .schedule-day {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        
+        .schedule-time {
+            color: var(--color-gray);
+        }
+        
+        .sold-out {
+            opacity: 0.7;
+        }
+        
+        .sold-out-label {
+            color: var(--color-red);
+            font-weight: 600;
+        }
+        
+        .similar-performances {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid var(--color-light-gray);
+        }
+        
+        .similar-performances h2 {
+            margin-bottom: 30px;
+            color: var(--color-blue);
+        }
+        
+        .performances-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .technical-info {
+            background: var(--color-light-gray);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .technical-info h3 {
+            margin-bottom: 15px;
+            color: var(--color-blue);
+        }
+        
+        .technical-info ul {
+            list-style: none;
+        }
+        
+        .technical-info li {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .technical-info li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .technical-info strong {
+            color: var(--color-black);
+        }
+        
+        @media (max-width: 992px) {
+            .performance-header {
+                flex-direction: column;
+            }
+            
+            .performance-poster {
+                flex: 0 0 auto;
+                width: 100%;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+            
+            .performance-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .performance-title {
+                font-size: 2rem;
+            }
+            
+            .performance-actions {
+                flex-direction: column;
+            }
+            
+            .performance-actions .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header__container">
+            <a href="index.html" class="header__logo">
+                <div class="logo__icon">М</div>
+                <span class="logo__text">МИКОС</span>
+            </a>
+            
+            <button class="menu-toggle" id="menu-toggle" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <nav class="nav" id="main-nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link">Афиша</a></li>
+                    <li><a href="#performances" class="nav__link">Спектакли</a></li>
+                    <li><a href="booking.html" class="nav__link">Бронирование</a></li>
+                    <li><a href="#about" class="nav__link">О театре</a></li>
+                    <li><a href="#contacts" class="nav__link">Контакты</a></li>
+                    <li class="nav__auth" id="auth-container">
+                        <!-- Авторизация -->
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="performance-page">
+            <div class="container">
+                <!-- Хлебные крошки -->
+                <nav class="breadcrumbs">
+                    <a href="index.html">Главная</a> / 
+                    <a href="index.html#performances">Спектакли</a> / 
+                    <span>Лишь бы не было детей</span>
+                </nav>
+                
+                <!-- Заголовок спектакля -->
+                <div class="performance-header">
+                    <div class="performance-poster">
+                        <img src="images/content/1.jpg" alt="Лишь бы не было детей"
+                             onerror="this.src='https://via.placeholder.com/400x600/2C4068/FFFFFF?text=Лишь+бы+не+было+детей'">
+                    </div>
+                    
+                    <div class="performance-info">
+                        <h1 class="performance-title" id="performance-title">Лишь бы не было детей</h1>
+                        
+                        <div class="performance-meta">
+                            <span class="meta-item age">18+</span>
+                            <span class="meta-item">90 минут</span>
+                            <span class="meta-item">Клоунада, Драма</span>
+                            <span class="meta-item">С 2019 года</span>
+                        </div>
+                        
+                        <div class="performance-price">от 1500 ₽</div>
+                        
+                        <div class="performance-actions">
+                            <a href="booking.html?performance=1" class="btn btn--primary btn--lg">Купить билеты</a>
+                            <button class="btn btn--outline btn--lg" id="add-favorite">
+                                В избранное
+                            </button>
+                        </div>
+                        
+                        <div class="performance-short">
+                            <p style="font-size: 1.1rem; line-height: 1.6; color: var(--color-gray);">
+                                Театр-феномен, соединяющий 30-летние традиции высочайшего мастерства клоунады с авангардной, эксцентричной подачей.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Основной контент -->
+                <div class="performance-content">
+                    <div class="performance-description">
+                        <h3>О спектакле</h3>
+                        <p>История сосуществования в одном пространстве нескольких людей — очень разных. Они пытаются выжить, сохранить своё «я», не сойти с ума. И всё это — через призму клоунады, самого человечного из искусств.</p>
+                        
+                        <p>Спектакль «Лишь бы не было детей» — это глубокое исследование человеческих отношений, одиночества в толпе и поиска смысла в абсурде повседневности. Режиссёр Сергей «Паганель» Давыдов создал произведение, которое заставляет смеяться до слёз и плакать от смеха.</p>
+                        
+                        <h3>Режиссёр о спектакле</h3>
+                        <p>«Это спектакль о нас. О том, как мы пытаемся быть вместе, но оставаться собой. О том, как мы боимся близости, но жаждем её. И о том, что дети — это не всегда буквально дети. Это могут быть наши страхи, мечты, несбывшиеся надежды».</p>
+                        
+                        <h3>Критика</h3>
+                        <blockquote style="border-left: 4px solid var(--color-beige); padding-left: 20px; margin: 20px 0; font-style: italic; color: var(--color-gray);">
+                            <p>««Лишь бы не было детей» — это не просто спектакль, это опыт. Опыт проживания чужих жизней, чужих страхов и чужих надежд. Театр «Микос» снова доказывает, что клоунада — это не про смешные носы, а про человеческую душу».</p>
+                            <cite style="display: block; margin-top: 10px; font-size: 0.9rem; color: var(--color-blue);">— Театральный обозреватель «Коммерсантъ»</cite>
+                        </blockquote>
+                    </div>
+                    
+                    <div class="performance-sidebar">
+                        <div class="cast-list">
+                            <h3>В ролях</h3>
+                            <div class="cast-item">
+                                <div class="cast-avatar">СД</div>
+                                <div class="cast-info">
+                                    <h4>Сергей «Паганель» Давыдов</h4>
+                                    <p>Художественный руководитель</p>
+                                </div>
+                            </div>
+                            <div class="cast-item">
+                                <div class="cast-avatar">МИ</div>
+                                <div class="cast-info">
+                                    <h4>Мария Иванова</h4>
+                                    <p>Актриса</p>
+                                </div>
+                            </div>
+                            <div class="cast-item">
+                                <div class="cast-avatar">АП</div>
+                                <div class="cast-info">
+                                    <h4>Алексей Петров</h4>
+                                    <p>Актер</p>
+                                </div>
+                            </div>
+                            <div class="cast-item">
+                                <div class="cast-avatar">ЕС</div>
+                                <div class="cast-info">
+                                    <h4>Елена Смирнова</h4>
+                                    <p>Актриса</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="technical-info">
+                            <h3>Техническая информация</h3>
+                            <ul>
+                                <li><strong>Сцена:</strong> Основная сцена</li>
+                                <li><strong>Продолжительность:</strong> 90 минут без антракта</li>
+                                <li><strong>Премьера:</strong> 15 сентября 2019</li>
+                                <li><strong>Язык:</strong> Русский</li>
+                                <li><strong>Режиссер:</strong> Сергей «Паганель» Давыдов</li>
+                                <li><strong>Художник:</strong> Анна Козлова</li>
+                                <li><strong>Композитор:</strong> Дмитрий Волков</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Расписание -->
+                <section class="schedule-section">
+                    <h2>Ближайшие даты</h2>
+                    <div class="schedule-grid" id="schedule-list">
+                        <!-- Динамически заполняется -->
+                    </div>
+                </section>
+                
+                <!-- Похожие спектакли -->
+                <section class="similar-performances">
+                    <h2>Вам также может понравиться</h2>
+                    <div class="performances-grid" id="similar-performances">
+                        <div class="card">
+                            <div class="card__image">
+                                <img src="images/content/2.jpg" alt="Авиаторы"
+                                     onerror="this.src='https://via.placeholder.com/400x200/2C4068/FFFFFF?text=Авиаторы'">
+                                <div class="card__badge">16+</div>
+                            </div>
+                            <div class="card__content">
+                                <h3 class="card__title">Авиаторы</h3>
+                                <div class="card__meta">
+                                    <span>75 мин</span>
+                                    <span>Клоунада, Драма</span>
+                                </div>
+                                <div class="card__footer">
+                                    <div style="font-weight: 700; color: var(--color-red);">
+                                        от 1200 ₽
+                                    </div>
+                                    <a href="performance.html?id=2" class="btn btn--outline btn--sm">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card__image">
+                                <img src="images/content/4.jpg" alt="Цирк навсегда"
+                                     onerror="this.src='https://via.placeholder.com/400x200/2C4068/FFFFFF?text=Цирк+навсегда'">
+                                <div class="card__badge">16+</div>
+                            </div>
+                            <div class="card__content">
+                                <h3 class="card__title">Цирк навсегда</h3>
+                                <div class="card__meta">
+                                    <span>85 мин</span>
+                                    <span>Клоунада, Драма</span>
+                                </div>
+                                <div class="card__footer">
+                                    <div style="font-weight: 700; color: var(--color-red);">
+                                        от 1300 ₽
+                                    </div>
+                                    <a href="performance.html?id=4" class="btn btn--outline btn--sm">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card__image">
+                                <img src="images/content/5.jpg" alt="Тишина"
+                                     onerror="this.src='https://via.placeholder.com/400x200/2C4068/FFFFFF?text=Тишина'">
+                                <div class="card__badge">18+</div>
+                            </div>
+                            <div class="card__content">
+                                <h3 class="card__title">Тишина</h3>
+                                <div class="card__meta">
+                                    <span>95 мин</span>
+                                    <span>Клоунада, Драма</span>
+                                </div>
+                                <div class="card__footer">
+                                    <div style="font-weight: 700; color: var(--color-red);">
+                                        от 1600 ₽
+                                    </div>
+                                    <a href="performance.html?id=5" class="btn btn--outline btn--sm">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="footer">
+        <div class="footer__container">
+            <div class="footer__grid">
+                <div class="footer__section">
+                    <h3 class="footer__title">Театр "Микос"</h3>
+                    <p class="footer__description">
+                        Театр-феномен, соединяющий 30-летние традиции высочайшего мастерства клоунады с авангардной, эксцентричной подачей.
+                    </p>
+                </div>
+                
+                <div class="footer__section">
+                    <h3 class="footer__title">Меню</h3>
+                    <ul class="footer__links">
+                        <li><a href="index.html">Афиша</a></li>
+                        <li><a href="#performances">Спектакли</a></li>
+                        <li><a href="booking.html">Бронирование</a></li>
+                        <li><a href="#about">О театре</a></li>
+                        <li><a href="#contacts">Контакты</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer__section">
+                    <h3 class="footer__title">Контакты</h3>
+                    <div class="footer__contacts">
+                        <div class="contact-item">
+                            <div style="color: var(--color-red);">📞</div>
+                            <div class="contact-text">+7 (495) 123-45-67</div>
+                        </div>
+                        <div class="contact-item">
+                            <div style="color: var(--color-red);">✉️</div>
+                            <div class="contact-text">info@micos-theatre.ru</div>
+                        </div>
+                        <div class="contact-item">
+                            <div style="color: var(--color-red);">📍</div>
+                            <div class="contact-text">Москва, ул. Театральная, 1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer__bottom">
+                <div class="footer__copyright">© 2024 Театр "Микос". Все права защищены.</div>
+                <div class="footer__legal">
+                    <a href="#" class="footer__legal-link">Политика конфиденциальности</a>
+                    <a href="#" class="footer__legal-link">Пользовательское соглашение</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/modules/performance.js"></script>
+</body>
+</html>
