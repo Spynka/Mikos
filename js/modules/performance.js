@@ -105,6 +105,20 @@ class PerformancePage {
         // Обновляем заголовок страницы
         document.title = `${this.performance.title} | Театр "Микос"`;
         
+        // ОБНОВЛЯЕМ ИЗОБРАЖЕНИЕ СПЕКТАКЛЯ (ДОБАВЛЕН НОВЫЙ КОД)
+        const posterImg = document.querySelector('.performance-poster img');
+        if (posterImg) {
+            // Формируем путь к изображению на основе ID спектакля
+            const imagePath = `images/content/${this.performanceId}.jpg`;
+            posterImg.src = imagePath;
+            posterImg.alt = this.performance.title;
+            
+            // Обработчик ошибки загрузки изображения
+            posterImg.onerror = () => {
+                posterImg.src = `https://via.placeholder.com/400x600/2C4068/FFFFFF?text=${encodeURIComponent(this.performance.title)}`;
+            };
+        }
+        
         // Обновляем хлебные крошки
         const breadcrumbs = document.querySelector('.breadcrumbs span');
         if (breadcrumbs) {
@@ -115,6 +129,29 @@ class PerformancePage {
         const performanceTitle = document.querySelector('.performance-title');
         if (performanceTitle) {
             performanceTitle.textContent = this.performance.title;
+        }
+        
+        // ОБНОВЛЯЕМ МЕТА-ИНФОРМАЦИЮ СПЕКТАКЛЯ (ДОБАВЛЕН НОВЫЙ КОД)
+        const ageElement = document.querySelector('.meta-item.age');
+        const durationElement = document.querySelector('.performance-meta .meta-item:nth-child(2)');
+        const genreElement = document.querySelector('.performance-meta .meta-item:nth-child(3)');
+        const yearElement = document.querySelector('.performance-meta .meta-item:nth-child(4)');
+        
+        if (ageElement) ageElement.textContent = this.performance.age;
+        if (durationElement) durationElement.textContent = this.performance.duration;
+        if (genreElement) genreElement.textContent = this.performance.genre;
+        if (yearElement) yearElement.textContent = `С ${this.performance.year} года`;
+        
+        // ОБНОВЛЯЕМ ЦЕНУ СПЕКТАКЛЯ (ДОБАВЛЕН НОВЫЙ КОД)
+        const priceElement = document.querySelector('.performance-price');
+        if (priceElement) {
+            priceElement.textContent = `от ${this.performance.price} ₽`;
+        }
+        
+        // ОБНОВЛЯЕМ ССЫЛКУ ДЛЯ БРОНИРОВАНИЯ (ДОБАВЛЕН НОВЫЙ КОД)
+        const bookingLink = document.querySelector('.performance-actions a.btn--primary');
+        if (bookingLink) {
+            bookingLink.href = `booking.html?performance=${this.performanceId}`;
         }
         
         const performanceDescription = document.querySelector('.performance-description');
