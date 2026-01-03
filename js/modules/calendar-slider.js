@@ -176,7 +176,13 @@ class CalendarSlider {
         
         this.updateNavButtons();
     }
-
+	
+	getMonthNameGenitive(monthIndex) {
+		const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
+					   'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+		return months[monthIndex];
+	}
+	
     getVisibleDays() {
         const days = [];
         const startDate = new Date(this.currentDate);
@@ -391,16 +397,16 @@ class CalendarSlider {
         if (nextBtn) nextBtn.disabled = false;
     }
 
-    formatDateRange(startDate, endDate) {
-        const startMonth = startDate.toLocaleDateString('ru-RU', { month: 'long' });
-        const endMonth = endDate.toLocaleDateString('ru-RU', { month: 'long' });
-        
-        if (startMonth === endMonth) {
-            return `${startDate.getDate()} - ${endDate.getDate()} ${startMonth}`;
-        } else {
-            return `${startDate.getDate()} ${startMonth} - ${endDate.getDate()} ${endMonth}`;
-        }
-    }
+	formatDateRange(startDate, endDate) {
+		const startMonth = this.getMonthNameGenitive(startDate.getMonth());
+		const endMonth = this.getMonthNameGenitive(endDate.getMonth());
+		
+		if (startMonth === endMonth) {
+			return `${startDate.getDate()} - ${endDate.getDate()} ${startMonth}`;
+		} else {
+			return `${startDate.getDate()} ${startMonth} - ${endDate.getDate()} ${endMonth}`;
+		}
+	}
 
     bindEvents() {
         const prevBtn = document.querySelector('.calendar-slider__btn--prev');
