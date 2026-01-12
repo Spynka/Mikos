@@ -2,22 +2,29 @@
 class PerformancePage {
     constructor() {
         this.performanceId = this.getPerformanceIdFromUrl();
+        this.performance = null;
+        console.log('PerformancePage: конструктор для спектакля ID:', this.performanceId);
         this.init();
     }
 
     getPerformanceIdFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('id') || '1';
+        const id = urlParams.get('id') || '1';
+        console.log('PerformancePage: получен ID из URL:', id);
+        return id;
     }
 
     async init() {
+        console.log('PerformancePage: init() начат');
         await this.loadPerformanceData();
         this.renderPerformance();
         this.bindEvents();
-        this.loadSchedule();
+        await this.loadSchedule();
+        console.log('PerformancePage: init() завершен');
     }
 
     async loadPerformanceData() {
+        console.log('PerformancePage: загрузка данных спектакля...');
         // Статические данные для демонстрации
         const performances = {
             1: {
@@ -99,21 +106,21 @@ class PerformancePage {
         };
         
         this.performance = performances[this.performanceId] || performances[1];
+        console.log('PerformancePage: данные спектакля загружены:', this.performance.title);
     }
 
     renderPerformance() {
+        console.log('PerformancePage: renderPerformance()');
         // Обновляем заголовок страницы
         document.title = `${this.performance.title} | Театр "Микос"`;
         
-        // ОБНОВЛЯЕМ ИЗОБРАЖЕНИЕ СПЕКТАКЛЯ (ДОБАВЛЕН НОВЫЙ КОД)
+        // ОБНОВЛЯЕМ ИЗОБРАЖЕНИЕ СПЕКТАКЛЯ
         const posterImg = document.querySelector('.performance-poster img');
         if (posterImg) {
-            // Формируем путь к изображению на основе ID спектакля
             const imagePath = `images/content/${this.performanceId}.jpg`;
             posterImg.src = imagePath;
             posterImg.alt = this.performance.title;
             
-            // Обработчик ошибки загрузки изображения
             posterImg.onerror = () => {
                 posterImg.src = `https://via.placeholder.com/400x600/2C4068/FFFFFF?text=${encodeURIComponent(this.performance.title)}`;
             };
@@ -131,7 +138,7 @@ class PerformancePage {
             performanceTitle.textContent = this.performance.title;
         }
         
-        // ОБНОВЛЯЕМ МЕТА-ИНФОРМАЦИЮ СПЕКТАКЛЯ (ДОБАВЛЕН НОВЫЙ КОД)
+        // ОБНОВЛЯЕМ МЕТА-ИНФОРМАЦИЮ СПЕКТАКЛЯ
         const ageElement = document.querySelector('.meta-item.age');
         const durationElement = document.querySelector('.performance-meta .meta-item:nth-child(2)');
         const genreElement = document.querySelector('.performance-meta .meta-item:nth-child(3)');
@@ -142,13 +149,13 @@ class PerformancePage {
         if (genreElement) genreElement.textContent = this.performance.genre;
         if (yearElement) yearElement.textContent = `С ${this.performance.year} года`;
         
-        // ОБНОВЛЯЕМ ЦЕНУ СПЕКТАКЛЯ (ДОБАВЛЕН НОВЫЙ КОД)
+        // ОБНОВЛЯЕМ ЦЕНУ СПЕКТАКЛЯ
         const priceElement = document.querySelector('.performance-price');
         if (priceElement) {
             priceElement.textContent = `от ${this.performance.price} ₽`;
         }
         
-        // ОБНОВЛЯЕМ ССЫЛКУ ДЛЯ БРОНИРОВАНИЯ (ДОБАВЛЕН НОВЫЙ КОД)
+        // ОБНОВЛЯЕМ ССЫЛКУ ДЛЯ БРОНИРОВАНИЯ
         const bookingLink = document.querySelector('.performance-actions a.btn--primary');
         if (bookingLink) {
             bookingLink.href = `booking.html?performance=${this.performanceId}`;
@@ -204,32 +211,79 @@ class PerformancePage {
     }
 
     async loadSchedule() {
+        console.log('PerformancePage: loadSchedule() начат');
         const scheduleList = document.getElementById('schedule-list');
-        if (!scheduleList) return;
+        if (!scheduleList) {
+            console.error('PerformancePage: Элемент schedule-list не найден');
+            return;
+        }
         
-        // Генерируем расписание на ближайшие 7 дней
+        // Показываем заглушку загрузки
+        scheduleList.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--color-gray);">
+                <p>Загрузка расписания...</p>
+            </div>
+        `;
+        
         const schedule = [];
         const today = new Date();
         
+        let events = {};
+        
+        // Пытаемся получить события из глобального экземпляра
+        if (window.calendarSliderInstance && window.calendarSliderInstance.events) {
+            console.log('PerformancePage: Используем глобальный calendarSliderInstance');
+            events = window.calendarSliderInstance.events;
+            console.log('PerformancePage: Событий в календаре:', Object.keys(events).length);
+        } else {
+            console.log('PerformancePage: Создаем новый calendarSliderInstance');
+            window.calendarSliderInstance = new CalendarSlider();
+            
+            // Даем время на инициализацию
+            await new Promise(resolve => setTimeout(resolve, 300));
+            events = window.calendarSliderInstance.events || {};
+            console.log('PerformancePage: Новый календарь создан. Событий:', Object.keys(events).length);
+        }
+        
+        console.log('PerformancePage: Ищем события для спектакля ID:', this.performanceId);
+        console.log('PerformancePage: Все даты с событиями:', Object.keys(events));
+        
+        // Ищем события для текущего спектакля на ближайшие 7 дней
         for (let i = 0; i < 7; i++) {
             const date = new Date(today);
             date.setDate(today.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
             
-            // Для каждого дня создаем 1-3 сеанса
-            const sessions = Math.floor(Math.random() * 3) + 1;
-            const times = ['18:00', '19:00', '20:00', '21:00'];
+            console.log(`PerformancePage: Проверяем дату ${dateStr}`);
             
-            for (let j = 0; j < sessions; j++) {
-                const available = Math.random() > 0.3; // 70% шанс, что есть билеты
-                const availableSeats = available ? Math.floor(Math.random() * 50) + 10 : 0;
+            if (events[dateStr]) {
+                // Фильтруем события по ID спектакля
+                const dayEvents = events[dateStr].filter(event => 
+                    String(event.id) === String(this.performanceId)
+                );
                 
-                schedule.push({
-                    date: date.toISOString().split('T')[0],
-                    time: times[Math.floor(Math.random() * times.length)],
-                    available: available,
-                    availableSeats: availableSeats
+                console.log(`PerformancePage: Дата ${dateStr}: найдено ${dayEvents.length} событий`);
+                
+                dayEvents.forEach(event => {
+                    schedule.push({
+                        date: dateStr,
+                        time: event.time,
+                        available: event.availableSeats > 0,
+                        availableSeats: event.availableSeats || 50
+                    });
                 });
+            } else {
+                console.log(`PerformancePage: Дата ${dateStr}: нет событий в календаре`);
             }
+        }
+        
+        console.log('PerformancePage: Всего найдено событий в расписании:', schedule.length);
+        
+        // Если ничего не найдено, используем fallback
+        if (schedule.length === 0) {
+            console.log('PerformancePage: Событий не найдено, используем fallback');
+            await this.loadScheduleFallback();
+            return;
         }
         
         // Сортируем по дате и времени
@@ -240,32 +294,131 @@ class PerformancePage {
         });
         
         // Отображаем расписание
-        scheduleList.innerHTML = schedule.map(item => `
-            <div class="schedule-item ${!item.available ? 'sold-out' : ''}">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="display: flex; flex-direction: column;">
-                        <div style="font-weight: 600; font-size: 1.125rem;">
-                            ${this.formatDate(item.date)}
+        this.displaySchedule(schedule);
+    }
+
+    async loadScheduleFallback() {
+        console.log('PerformancePage: loadScheduleFallback() начат');
+        const scheduleList = document.getElementById('schedule-list');
+        if (!scheduleList) return;
+        
+        const schedule = [];
+        const today = new Date();
+        
+        console.log('PerformancePage: Создаем fallback расписание для спектакля:', this.performance.title);
+        
+        // Создаем реалистичное расписание на ближайшие 3 дня
+        for (let i = 0; i < 3; i++) {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            // Разное количество сеансов в разные дни
+            let times = [];
+            if (i === 0) { // Сегодня
+                times = ['19:00', '21:00'];
+            } else if (i === 1) { // Завтра
+                times = ['18:00', '20:00'];
+            } else { // Послезавтра
+                times = ['19:00'];
+            }
+            
+            console.log(`PerformancePage: ${dateStr}: создаем ${times.length} сеансов`);
+            
+            times.forEach(time => {
+                schedule.push({
+                    date: dateStr,
+                    time: time,
+                    available: true,
+                    availableSeats: Math.floor(Math.random() * 50) + 10
+                });
+            });
+        }
+        
+        // Сортируем по дате и времени
+        schedule.sort((a, b) => {
+            const dateA = new Date(a.date + 'T' + a.time);
+            const dateB = new Date(b.date + 'T' + b.time);
+            return dateA - dateB;
+        });
+        
+        // Отображаем расписание
+        this.displaySchedule(schedule);
+    }
+
+    displaySchedule(schedule) {
+        console.log('PerformancePage: displaySchedule()', schedule);
+        const scheduleList = document.getElementById('schedule-list');
+        if (!scheduleList) return;
+        
+        if (schedule.length === 0) {
+            scheduleList.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--color-gray);">
+                    <p>На ближайшие даты нет сеансов</p>
+                    <p><small>Выберите другую дату или спектакль</small></p>
+                </div>
+            `;
+            return;
+        }
+        
+        scheduleList.innerHTML = schedule.map(item => {
+            // Проверяем, доступны ли билеты
+            const isAvailable = item.available && item.availableSeats > 0;
+            const fewSeatsLeft = isAvailable && item.availableSeats <= 10;
+            
+            // Форматируем дату
+            const date = new Date(item.date + 'T' + item.time);
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            
+            let dateText;
+            if (date.toDateString() === today.toDateString()) {
+                dateText = 'Сегодня';
+            } else if (date.toDateString() === tomorrow.toDateString()) {
+                dateText = 'Завтра';
+            } else {
+                dateText = date.toLocaleDateString('ru-RU', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                });
+            }
+            
+            return `
+                <div class="schedule-item ${!isAvailable ? 'sold-out' : ''}">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="display: flex; flex-direction: column;">
+                            <div style="font-weight: 600; font-size: 1.125rem;">
+                                ${dateText}
+                            </div>
+                            <div style="color: var(--color-gray);">
+                                ${item.time}
+                            </div>
                         </div>
-                        <div style="color: var(--color-gray);">
-                            ${item.time}
-                        </div>
+                        ${fewSeatsLeft ? 
+                            `<span style="background: rgba(244, 49, 57, 0.1); color: var(--color-red); 
+                              padding: 4px 8px; border-radius: 4px; font-size: 0.875rem; font-weight: 500;">
+                                Осталось ${item.availableSeats} мест
+                            </span>` : ''}
+                        ${!isAvailable ? 
+                            `<span style="background: rgba(244, 49, 57, 0.1); color: var(--color-red); 
+                              padding: 4px 8px; border-radius: 4px; font-size: 0.875rem; font-weight: 500;">
+                                Билетов нет
+                            </span>` : ''}
                     </div>
-                    ${item.available && item.availableSeats <= 10 ? 
-                        `<span style="background: rgba(244, 49, 57, 0.1); color: var(--color-red); 
-                          padding: 4px 8px; border-radius: 4px; font-size: 0.875rem; font-weight: 500;">
-                            Осталось ${item.availableSeats} мест
-                        </span>` : ''}
+                    <div>
+                        ${isAvailable ? 
+                            `<a href="booking.html?performance=${this.performanceId}&date=${item.date}&time=${item.time}" 
+                               class="btn btn--primary btn--sm">Купить билеты</a>` :
+                            `<span style="color: var(--color-red); font-weight: 600;">Билетов нет</span>`
+                        }
+                    </div>
                 </div>
-                <div>
-                    ${item.available ? 
-                        `<a href="booking.html?performance=${this.performance.id}&date=${item.date}&time=${item.time}" 
-                           class="btn btn--primary btn--sm">Купить билеты</a>` :
-                        `<span style="color: var(--color-red); font-weight: 600;">Билетов нет</span>`
-                    }
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+        
+        console.log('PerformancePage: расписание отображено, элементов:', schedule.length);
     }
 
     formatDate(dateStr) {
@@ -280,7 +433,7 @@ class PerformancePage {
             return 'Завтра';
         } else {
             return date.toLocaleDateString('ru-RU', {
-                weekday: 'short',
+                weekday: 'long',
                 day: 'numeric',
                 month: 'long'
             });
@@ -288,6 +441,7 @@ class PerformancePage {
     }
 
     bindEvents() {
+        console.log('PerformancePage: bindEvents()');
         // Добавление в избранное
         const favoriteBtn = document.getElementById('add-favorite');
         if (favoriteBtn) {
@@ -309,14 +463,15 @@ class PerformancePage {
     }
 
     toggleFavorite() {
+        console.log('PerformancePage: toggleFavorite()');
         let favorites = JSON.parse(localStorage.getItem('micos_favorites') || '[]');
-        const index = favorites.indexOf(this.performance.id);
+        const index = favorites.indexOf(this.performanceId);
         
         const favoriteBtn = document.getElementById('add-favorite');
         
         if (index === -1) {
             // Добавляем в избранное
-            favorites.push(this.performance.id);
+            favorites.push(this.performanceId);
             if (favoriteBtn) {
                 favoriteBtn.innerHTML = 'В избранном ✓';
                 favoriteBtn.style.background = 'var(--color-blue)';
@@ -349,6 +504,7 @@ class PerformancePage {
     }
 
     async loadSimilarPerformances() {
+        console.log('PerformancePage: loadSimilarPerformances()');
         const similarContainer = document.querySelector('.performances-grid');
         if (!similarContainer) return;
         
@@ -408,7 +564,11 @@ class PerformancePage {
 
 // Инициализация страницы спектакля
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded: Инициализация PerformancePage...');
     if (window.location.pathname.includes('performance.html')) {
-        new PerformancePage();
+        console.log('Найдена страница спектакля, создаем PerformancePage');
+        window.performancePage = new PerformancePage();
+    } else {
+        console.log('Это не страница спектакля');
     }
 });

@@ -5,16 +5,19 @@ class CalendarSlider {
         this.selectedDate = new Date();
         this.daysToShow = 7; // Показываем неделю
         this.events = {};
+        console.log('CalendarSlider: конструктор вызван');
         this.init();
     }
 
     init() {
+        console.log('CalendarSlider: init()');
         this.loadEvents();
         this.render();
         this.bindEvents();
     }
 
     loadEvents() {
+        console.log('CalendarSlider: загрузка событий...');
         // Создаем тестовые данные для спектаклей
         const today = new Date();
         this.events = {};
@@ -101,7 +104,14 @@ class CalendarSlider {
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
         
-        this.events[today.toISOString().split('T')[0]] = [
+        const todayStr = today.toISOString().split('T')[0];
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        
+        // Гарантируем события на сегодня
+        if (!this.events[todayStr]) {
+            this.events[todayStr] = [];
+        }
+        this.events[todayStr].push(
             {
                 id: 1,
                 title: 'Лишь бы не было детей',
@@ -122,9 +132,13 @@ class CalendarSlider {
                 availableSeats: 67,
                 totalSeats: 100
             }
-        ];
+        );
         
-        this.events[tomorrow.toISOString().split('T')[0]] = [
+        // Гарантируем события на завтра
+        if (!this.events[tomorrowStr]) {
+            this.events[tomorrowStr] = [];
+        }
+        this.events[tomorrowStr].push(
             {
                 id: 2,
                 title: 'Авиаторы',
@@ -145,10 +159,13 @@ class CalendarSlider {
                 availableSeats: 28,
                 totalSeats: 100
             }
-        ];
+        );
+        
+        console.log('CalendarSlider: события загружены. Всего дней со событиями:', Object.keys(this.events).length);
     }
 
     render() {
+        console.log('CalendarSlider: render()');
         this.renderCalendar();
         this.renderSelectedDatePerformances();
     }
@@ -176,13 +193,13 @@ class CalendarSlider {
         
         this.updateNavButtons();
     }
-	
-	getMonthNameGenitive(monthIndex) {
-		const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
-					   'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-		return months[monthIndex];
-	}
-	
+    
+    getMonthNameGenitive(monthIndex) {
+        const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
+                       'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+        return months[monthIndex];
+    }
+    
     getVisibleDays() {
         const days = [];
         const startDate = new Date(this.currentDate);
@@ -397,16 +414,16 @@ class CalendarSlider {
         if (nextBtn) nextBtn.disabled = false;
     }
 
-	formatDateRange(startDate, endDate) {
-		const startMonth = this.getMonthNameGenitive(startDate.getMonth());
-		const endMonth = this.getMonthNameGenitive(endDate.getMonth());
-		
-		if (startMonth === endMonth) {
-			return `${startDate.getDate()} - ${endDate.getDate()} ${startMonth}`;
-		} else {
-			return `${startDate.getDate()} ${startMonth} - ${endDate.getDate()} ${endMonth}`;
-		}
-	}
+    formatDateRange(startDate, endDate) {
+        const startMonth = this.getMonthNameGenitive(startDate.getMonth());
+        const endMonth = this.getMonthNameGenitive(endDate.getMonth());
+        
+        if (startMonth === endMonth) {
+            return `${startDate.getDate()} - ${endDate.getDate()} ${startMonth}`;
+        } else {
+            return `${startDate.getDate()} ${startMonth} - ${endDate.getDate()} ${endMonth}`;
+        }
+    }
 
     bindEvents() {
         const prevBtn = document.querySelector('.calendar-slider__btn--prev');
@@ -467,8 +484,13 @@ class CalendarSlider {
 
 // Инициализация календаря
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded: Инициализация календаря...');
     const calendarSlider = document.querySelector('.calendar-slider');
     if (calendarSlider) {
-        new CalendarSlider();
+        window.calendarSliderInstance = new CalendarSlider();
+        console.log('calendarSliderInstance создан и сохранен в window');
+        console.log('Событий в календаре:', Object.keys(window.calendarSliderInstance.events).length);
+    } else {
+        console.log('Календарь не найден на странице');
     }
 });
