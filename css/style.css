@@ -923,3 +923,117 @@ body {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* Стили для фильтрованных событий в календаре */
+.calendar-day__events--filtered {
+    opacity: 0.5;
+}
+
+.calendar-day__event-dot--filtered {
+    background-color: #ccc !important;
+}
+
+/* Стили для календаря */
+.calendar-day {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+    transform: translateY(-2px);
+}
+
+.calendar-day__events {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 5px;
+}
+
+.calendar-day__event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-red);
+}
+
+.calendar-day__event-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--color-red);
+    color: white;
+    font-size: 10px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Стили для карточек спектаклей */
+.performance-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.performance-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.performance-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.performance-card__title {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--color-blue);
+}
+
+.performance-card__time {
+    background: var(--color-beige);
+    color: var(--color-blue);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.performance-card__meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: var(--color-gray);
+    font-size: 0.9rem;
+}
+
+.performance-card__age {
+    background: var(--color-blue);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+.performance-card__price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-red);
+}
+
+.no-performances {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: var(--color-gray);
+}

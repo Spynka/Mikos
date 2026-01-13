@@ -3,8 +3,13 @@ class CalendarSlider {
     constructor() {
         this.currentDate = new Date();
         this.selectedDate = new Date();
-        this.daysToShow = 7; // Показываем неделю
+        this.daysToShow = 7;
         this.events = {};
+        this.activeFilters = {
+            performance: 'all',
+            time: 'all',
+            age: 'all'
+        };
         console.log('CalendarSlider: конструктор вызван');
         this.init();
     }
@@ -18,7 +23,6 @@ class CalendarSlider {
 
     loadEvents() {
         console.log('CalendarSlider: загрузка событий...');
-        // Создаем тестовые данные для спектаклей
         const today = new Date();
         this.events = {};
         
@@ -28,12 +32,10 @@ class CalendarSlider {
             date.setDate(today.getDate() + i);
             const dateStr = date.toISOString().split('T')[0];
             
-            // Для каждого дня создаем 0-4 спектакля
             const dayEvents = [];
-            const eventCount = Math.floor(Math.random() * 5); // 0-4 спектакля
+            const eventCount = Math.floor(Math.random() * 5);
             
             for (let j = 0; j < eventCount; j++) {
-                // Список всех спектаклей
                 const performances = [
                     { 
                         id: 1, 
@@ -77,14 +79,12 @@ class CalendarSlider {
                     }
                 ];
                 
-                // Выбираем случайный спектакль
                 const performance = performances[Math.floor(Math.random() * performances.length)];
                 
-                // Случайное время (18:00, 19:00, 20:00, 21:00)
+                // Добавляем разные времена для разнообразия
                 const times = ['18:00', '19:00', '20:00', '21:00'];
                 const randomTime = times[Math.floor(Math.random() * times.length)];
                 
-                // Случайное количество доступных мест
                 const availableSeats = Math.floor(Math.random() * 50) + 10;
                 
                 dayEvents.push({
@@ -100,7 +100,7 @@ class CalendarSlider {
             }
         }
         
-        // Добавляем гарантированные события на сегодня и завтра
+        // Гарантированные события на сегодня и завтра
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
         
@@ -131,6 +131,16 @@ class CalendarSlider {
                 duration: '85 мин',
                 availableSeats: 67,
                 totalSeats: 100
+            },
+            {
+                id: 5,
+                title: 'Тишина',
+                time: '21:00',
+                age: '18+',
+                price: 1600,
+                duration: '95 мин',
+                availableSeats: 25,
+                totalSeats: 100
             }
         );
         
@@ -147,6 +157,16 @@ class CalendarSlider {
                 price: 1200,
                 duration: '75 мин',
                 availableSeats: 32,
+                totalSeats: 100
+            },
+            {
+                id: 3,
+                title: 'Богатыри',
+                time: '18:00',
+                age: '12+',
+                price: 1400,
+                duration: '80 мин',
+                availableSeats: 48,
                 totalSeats: 100
             },
             {
@@ -183,7 +203,6 @@ class CalendarSlider {
             container.appendChild(dayElement);
         });
         
-        // Обновляем заголовок
         const title = document.querySelector('.calendar-slider__title');
         if (title) {
             const firstDay = days[0];
@@ -204,7 +223,6 @@ class CalendarSlider {
         const days = [];
         const startDate = new Date(this.currentDate);
         
-        // Находим ближайший понедельник
         const dayOfWeek = startDate.getDay();
         const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
         startDate.setDate(startDate.getDate() + diff);
@@ -232,13 +250,11 @@ class CalendarSlider {
         const isToday = date.toDateString() === today.toDateString();
         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
         
-        // Добавляем классы
         if (isSelected) dayElement.classList.add('calendar-day--selected');
         if (isToday) dayElement.classList.add('calendar-day--today');
         if (hasEvents) dayElement.classList.add('calendar-day--has-events');
         if (isWeekend) dayElement.classList.add('calendar-day--weekend');
         
-        // Форматируем
         const weekdays = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
         const weekday = weekdays[date.getDay()];
         
@@ -251,9 +267,12 @@ class CalendarSlider {
             <div class="calendar-day__month">${month}</div>
         `;
         
-        // Добавляем точки для спектаклей
-        if (hasEvents) {
-            const eventsCount = Math.min(events.length, 3);
+        // Обновляем подсчет событий с учетом фильтров
+        const filteredEvents = this.applyFiltersToEvents(events);
+        const hasFilteredEvents = filteredEvents.length > 0;
+        
+        if (hasFilteredEvents) {
+            const eventsCount = Math.min(filteredEvents.length, 3);
             const eventsDots = document.createElement('div');
             eventsDots.className = 'calendar-day__events';
             
@@ -265,16 +284,25 @@ class CalendarSlider {
             
             dayElement.appendChild(eventsDots);
             
-            // Если спектаклей больше 3, показываем счетчик
-            if (events.length > 3) {
+            if (filteredEvents.length > 3) {
                 const count = document.createElement('div');
                 count.className = 'calendar-day__event-count';
-                count.textContent = events.length;
+                count.textContent = filteredEvents.length;
                 dayElement.appendChild(count);
             }
+        } else if (hasEvents) {
+            // Если есть события, но они все отфильтрованы - показываем серые точки
+            const eventsDots = document.createElement('div');
+            eventsDots.className = 'calendar-day__events calendar-day__events--filtered';
+            eventsDots.title = 'События отфильтрованы';
+            
+            const dot = document.createElement('div');
+            dot.className = 'calendar-day__event-dot calendar-day__event-dot--filtered';
+            eventsDots.appendChild(dot);
+            
+            dayElement.appendChild(eventsDots);
         }
         
-        // Обработчик клика
         dayElement.addEventListener('click', () => {
             this.selectDate(date);
         });
@@ -308,7 +336,9 @@ class CalendarSlider {
         const dateStr = this.selectedDate.toISOString().split('T')[0];
         const events = this.events[dateStr] || [];
         
-        // Обновляем заголовок с датой
+        // Применяем фильтры к событиям
+        const filteredEvents = this.applyFiltersToEvents(events);
+        
         if (dateElement) {
             const today = new Date();
             const tomorrow = new Date(today);
@@ -327,31 +357,41 @@ class CalendarSlider {
                 });
             }
             
+            // Добавляем информацию о фильтрах
+            const filterInfo = this.getFilterInfo();
+            if (filterInfo) {
+                dateText += ` (${filterInfo})`;
+            }
+            
             dateElement.textContent = dateText;
         }
         
-        // Очищаем контейнер
         container.innerHTML = '';
         
-        if (events.length === 0) {
+        if (filteredEvents.length === 0) {
+            let message = 'На выбранную дату нет спектаклей';
+            const filterInfo = this.getFilterInfo();
+            if (filterInfo && events.length > 0) {
+                message = `Нет спектаклей по выбранным фильтрам (${filterInfo})`;
+            }
+            
             container.innerHTML = `
                 <div class="no-performances">
-                    <p>На выбранную дату нет спектаклей</p>
-                    <p><small>Выберите другую дату в календаре</small></p>
+                    <p>${message}</p>
+                    <p><small>Попробуйте выбрать другую дату или изменить фильтры</small></p>
                 </div>
             `;
             return;
         }
         
         // Сортируем по времени
-        events.sort((a, b) => {
+        filteredEvents.sort((a, b) => {
             const timeA = a.time.split(':').map(Number);
             const timeB = b.time.split(':').map(Number);
             return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
         });
         
-        // Создаем карточки спектаклей
-        events.forEach(event => {
+        filteredEvents.forEach(event => {
             const card = this.createPerformanceCard(event);
             container.appendChild(card);
         });
@@ -361,7 +401,6 @@ class CalendarSlider {
         const card = document.createElement('div');
         card.className = 'performance-card';
         
-        // Проверяем, есть ли доступные места
         const isSoldOut = event.availableSeats === 0;
         const fewSeatsLeft = event.availableSeats > 0 && event.availableSeats <= 10;
         
@@ -390,6 +429,57 @@ class CalendarSlider {
         return card;
     }
 
+    // МЕТОД ДЛЯ ПРИМЕНЕНИЯ ФИЛЬТРОВ К СОБЫТИЯМ
+    applyFiltersToEvents(events) {
+        if (!events || events.length === 0) return [];
+        
+        return events.filter(event => {
+            // Фильтр по спектаклю
+            if (this.activeFilters.performance !== 'all') {
+                if (event.id.toString() !== this.activeFilters.performance) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по времени
+            if (this.activeFilters.time !== 'all') {
+                if (event.time !== this.activeFilters.time) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по возрасту
+            if (this.activeFilters.age !== 'all') {
+                if (event.age !== this.activeFilters.age) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    }
+
+    // МЕТОД ДЛЯ ПОЛУЧЕНИЯ ТЕКСТОВОГО ОПИСАНИЯ АКТИВНЫХ ФИЛЬТРОВ
+    getFilterInfo() {
+        const activeFilters = [];
+        
+        if (this.activeFilters.performance !== 'all') {
+            const performanceSelect = document.getElementById('performance-filter');
+            const selectedOption = performanceSelect?.options[performanceSelect.selectedIndex];
+            activeFilters.push(selectedOption?.text || '');
+        }
+        
+        if (this.activeFilters.time !== 'all') {
+            activeFilters.push(`в ${this.activeFilters.time}`);
+        }
+        
+        if (this.activeFilters.age !== 'all') {
+            activeFilters.push(this.activeFilters.age);
+        }
+        
+        return activeFilters.length > 0 ? activeFilters.join(', ') : null;
+    }
+
     prevWeek() {
         const newDate = new Date(this.currentDate);
         newDate.setDate(newDate.getDate() - 7);
@@ -408,8 +498,6 @@ class CalendarSlider {
         const prevBtn = document.querySelector('.calendar-slider__btn--prev');
         const nextBtn = document.querySelector('.calendar-slider__btn--next');
         
-        // В реальном приложении здесь можно добавить логику
-        // для отключения кнопок, если нет данных
         if (prevBtn) prevBtn.disabled = false;
         if (nextBtn) nextBtn.disabled = false;
     }
@@ -437,25 +525,36 @@ class CalendarSlider {
             nextBtn.addEventListener('click', () => this.nextWeek());
         }
         
-        // Автоматическая прокрутка к выбранной дате при загрузке
         setTimeout(() => this.scrollToSelectedDate(), 300);
         
-        // Фильтры (если есть)
+        // ПРИВЯЗКА ФИЛЬТРОВ
         const performanceFilter = document.getElementById('performance-filter');
         const timeFilter = document.getElementById('time-filter');
         const ageFilter = document.getElementById('age-filter');
         const resetFilters = document.getElementById('reset-filters');
         
         if (performanceFilter) {
-            performanceFilter.addEventListener('change', () => this.applyFilters());
+            performanceFilter.addEventListener('change', (e) => {
+                this.activeFilters.performance = e.target.value;
+                console.log('Фильтр спектакля изменен на:', e.target.value);
+                this.applyFilters();
+            });
         }
         
         if (timeFilter) {
-            timeFilter.addEventListener('change', () => this.applyFilters());
+            timeFilter.addEventListener('change', (e) => {
+                this.activeFilters.time = e.target.value;
+                console.log('Фильтр времени изменен на:', e.target.value);
+                this.applyFilters();
+            });
         }
         
         if (ageFilter) {
-            ageFilter.addEventListener('change', () => this.applyFilters());
+            ageFilter.addEventListener('change', (e) => {
+                this.activeFilters.age = e.target.value;
+                console.log('Фильтр возраста изменен на:', e.target.value);
+                this.applyFilters();
+            });
         }
         
         if (resetFilters) {
@@ -463,13 +562,27 @@ class CalendarSlider {
         }
     }
 
+    // ОСНОВНОЙ МЕТОД ПРИМЕНЕНИЯ ФИЛЬТРОВ
     applyFilters() {
-        // Здесь будет логика фильтрации
-        console.log('Applying filters...');
+        console.log('Применение фильтров:', this.activeFilters);
+        
+        // Обновляем визуализацию календаря (точки событий)
+        this.renderCalendar();
+        
+        // Обновляем отображение спектаклей
         this.renderSelectedDatePerformances();
+        
+        // Показываем уведомление о применении фильтров
+        const filterInfo = this.getFilterInfo();
+        if (filterInfo) {
+            window.showNotification(`Применены фильтры: ${filterInfo}`, 'info', 2000);
+        }
     }
 
     resetFilters() {
+        console.log('Сброс фильтров');
+        
+        // Сбрасываем фильтры в DOM
         const performanceFilter = document.getElementById('performance-filter');
         const timeFilter = document.getElementById('time-filter');
         const ageFilter = document.getElementById('age-filter');
@@ -478,7 +591,19 @@ class CalendarSlider {
         if (timeFilter) timeFilter.value = 'all';
         if (ageFilter) ageFilter.value = 'all';
         
+        // Сбрасываем активные фильтры
+        this.activeFilters = {
+            performance: 'all',
+            time: 'all',
+            age: 'all'
+        };
+        
+        // Перерисовываем интерфейс
+        this.renderCalendar();
         this.renderSelectedDatePerformances();
+        
+        // Уведомление о сбросе
+        window.showNotification('Все фильтры сброшены', 'success', 2000);
     }
 }
 
